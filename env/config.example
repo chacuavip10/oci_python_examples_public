@@ -1,0 +1,6 @@
+[DEFAULT]
+user=ocid1.user.oc1..hidden
+fingerprint=f2:d6:9b:1d:hidden
+tenancy=ocid1.tenancy.oc1..hidden
+region=ap-hidden
+key_file=C:/somepath/oci_python_examples_public/env/oci_private_key.pem

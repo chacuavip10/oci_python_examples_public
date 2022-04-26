@@ -1,0 +1,15 @@
+# Virtual env
+.venv/
+# private
+# .env/
+oci_python_examples/*.ipynb
+oci_python_examples/*.pyc
+oci_python_examples/__pycache__/
+*.log
+oci_python_examples/*.log
+oci_python_examples/tempCodeRunnerFile.py
+.vscode/
+env/config
+env/oci_private_key.pem
+./script_ssh_key_autogen
+./script_ssh_key_autogen.pub
