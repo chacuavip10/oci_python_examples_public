@@ -20,10 +20,8 @@ def get_availability_domain(identity_client, compartment_id) -> list:
         identity_client.list_availability_domains, compartment_id
     )
     if len(list_availability_domains_response.data) == 0:
-        logging.critical(
-            "❌ No available availability domain was found in your region")
-        raise RuntimeError(
-            "No available availability domain was found in your region")
+        logging.critical("❌ No available availability domain was found in your region")
+        raise RuntimeError("No available availability domain was found in your region")
     return list_availability_domains_response.data
 
 
@@ -35,7 +33,7 @@ def input_with_confirm_availability_domain(identity_client, compartment_id):
     # print(availability_domain)
     print("\nList of available domain in your region:")
     for index, domain_name in enumerate(list_of_availability_domain):
-        print(f"\t[{index+1}]. {domain_name.name}")
+        print(f"\t[{index + 1}]. {domain_name.name}")
     print()
     answer = None
     while True:
@@ -63,7 +61,7 @@ def input_with_confirm_availability_domain(identity_client, compartment_id):
         if answer in ("s", "S"):
             print("List of available domain in your region:")
             for index, domain_name in enumerate(list_of_availability_domain):
-                print(f"\t[{index+1}]. {domain_name.name}")
+                print(f"\t[{index + 1}]. {domain_name.name}")
             print()
         else:
             try:
@@ -74,7 +72,7 @@ def input_with_confirm_availability_domain(identity_client, compartment_id):
     # Zero based index
     availability_domain = list_of_availability_domain[domain_index - 1]
     logging.info(
-        f'👉 "Always Free-eligible" Availability Domain setting by user: {list_of_availability_domain[domain_index-1].name}'
+        f'👉 "Always Free-eligible" Availability Domain setting by user: {list_of_availability_domain[domain_index - 1].name}'
     )
 
     return availability_domain
@@ -88,9 +86,9 @@ def input_with_confirm_free_shape_to_add(
         compartment_id=compartment_id,
         availability_domain=availability_domain,
     )
-    print("\nNote: At the time of 2022-03-30:")
+    print("\nNote: At the time of 2026-08-22:")
     print(
-        "\t- VM.Standard.A1.Flex is LIMITED_FREE, with total of 4 instances and 4 cpu - 24 GB Memory per account"
+        "\t- VM.Standard.A1.Flex is LIMITED_FREE, with total of 2 instances and 2 cpu - 12 GB Memory per account"
     )
     print(
         "\t- VM.Standard.E2.1.Micro is ALWAYS_FREE, with total of 2 instances per account"
@@ -100,7 +98,7 @@ def input_with_confirm_free_shape_to_add(
     )
     print("\nList of free shape in your domain:")
     for index, shape in enumerate(free_shapes):
-        print(f"\t[{index+1}]. {shape.shape}")
+        print(f"\t[{index + 1}]. {shape.shape}")
     print()
     shape_index = 1000
     while shape_index > len(free_shapes):
@@ -111,7 +109,7 @@ def input_with_confirm_free_shape_to_add(
         if answer in ("s", "S"):
             print("List of free shape in your domain:")
             for index, shape in enumerate(free_shapes):
-                print(f"\t[{index+1}]. {shape.shape}")
+                print(f"\t[{index + 1}]. {shape.shape}")
             print()
         else:
             try:
@@ -134,7 +132,7 @@ def input_with_config_image_to_add(compute_client, compartment_id, shape_to_add,
 
     print("\nList of image compatible with your instance:")
     for index, image in enumerate(all_images):
-        print(f"\t[{index+1}]. {image.display_name}")
+        print(f"\t[{index + 1}]. {image.display_name}")
     print()
 
     image_index = 1000
@@ -146,7 +144,7 @@ def input_with_config_image_to_add(compute_client, compartment_id, shape_to_add,
         if answer in ("s", "S"):
             print("\nList of image compatible with your instance:")
             for index, image in enumerate(all_images):
-                print(f"\t[{index+1}]. {image.display_name}")
+                print(f"\t[{index + 1}]. {image.display_name}")
             print()
         else:
             try:
@@ -160,8 +158,7 @@ def input_with_config_image_to_add(compute_client, compartment_id, shape_to_add,
 
 
 def list_all_instances(compute_client, config):
-    results = compute_client.list_instances(
-        compartment_id=config["tenancy"]).data
+    results = compute_client.list_instances(compartment_id=config["tenancy"]).data
 
     if not results:
         return None
@@ -182,10 +179,8 @@ You can ignore the out of capacity error.
 Verify the newly create Network and subnet in [OCI Accout Web Console] Networking > Virtual Cloud Network.
 """
         )
-        logging.critical(
-            "❌ No available network was found. Please create manually")
-        raise RuntimeError(
-            "No available network was found. Please create manually")
+        logging.critical("❌ No available network was found. Please create manually")
+        raise RuntimeError("No available network was found. Please create manually")
 
     return vcns
 
@@ -203,10 +198,8 @@ You can ignore the out of capacity error.
 Verify the newly create Network and subnet in [OCI Accout Web Console] Networking > Virtual Cloud Network.
 """
         )
-        logging.critical(
-            "❌ No available subnet was found. Please create manually")
-        raise RuntimeError(
-            "No available subnet was found. Please create manually")
+        logging.critical("❌ No available subnet was found. Please create manually")
+        raise RuntimeError("No available subnet was found. Please create manually")
 
     return subnets
 
@@ -248,9 +241,8 @@ def free_tier_check(
     future_to_add_a1_flex_ocpus=0.0,
     future_to_add_a1_flex_memory=0.0,
 ):
-    logging.info(
-        "Check resources including the instance you try to create if any...")
-    # Max 4 x VM.Standard.A1.Flex (4 ocpus/24GB), 2 x VM.Standard.E2.1.Micro
+    logging.info("Check resources including the instance you try to create if any...")
+    # Max 2 x VM.Standard.A1.Flex (2 ocpus/12GB), 2 x VM.Standard.E2.1.Micro
     free_exceed = False
     can_continue = True
     _a1_flex = _e2_1_micro = other_instances = 0
@@ -290,11 +282,11 @@ def free_tier_check(
         if _a1_flex + future_to_add_number_of_a1_flex_instance > 4:
             free_exceed = True
             logging.warning(
-                f"❌ VM.Standard.A1.Flex instances: Current {_a1_flex+future_to_add_number_of_a1_flex_instance} | Maximum: 4"
+                f"❌ VM.Standard.A1.Flex instances: Current {_a1_flex + future_to_add_number_of_a1_flex_instance} | Maximum: 4"
             )
         else:
             logging.info(
-                f"✅ VM.Standard.A1.Flex instances: Current {_a1_flex+future_to_add_number_of_a1_flex_instance} | Maximum: 4"
+                f"✅ VM.Standard.A1.Flex instances: Current {_a1_flex + future_to_add_number_of_a1_flex_instance} | Maximum: 4"
             )
 
         if (
@@ -303,21 +295,21 @@ def free_tier_check(
         ):
             free_exceed = True
             logging.warning(
-                f"❌ VM.Standard.A1.Flex resources: Current {_a1_flex_ocpus+future_to_add_a1_flex_ocpus} ocpus - {_a1_flex_memory+future_to_add_a1_flex_memory} GB Ram | Maximum: 4 ocpus - 24 GB Ram"
+                f"❌ VM.Standard.A1.Flex resources: Current {_a1_flex_ocpus + future_to_add_a1_flex_ocpus} ocpus - {_a1_flex_memory + future_to_add_a1_flex_memory} GB Ram | Maximum: 2 ocpus - 12 GB Ram"
             )
         else:
             logging.info(
-                f"✅ VM.Standard.A1.Flex resources: Current {_a1_flex_ocpus+future_to_add_a1_flex_ocpus} ocpus - {_a1_flex_memory+future_to_add_a1_flex_memory} GB Ram | Maximum: 4 ocpus - 24 GB Ram"
+                f"✅ VM.Standard.A1.Flex resources: Current {_a1_flex_ocpus + future_to_add_a1_flex_ocpus} ocpus - {_a1_flex_memory + future_to_add_a1_flex_memory} GB Ram | Maximum: 2 ocpus - 12 GB Ram"
             )
 
         if _e2_1_micro + future_to_add_number_of_E2_1_Micro > 2:
             free_exceed = True
             logging.warning(
-                f"❌ VM.Standard.E2.1.Micro instances: Current {_e2_1_micro+future_to_add_number_of_E2_1_Micro} | Maximum: 2"
+                f"❌ VM.Standard.E2.1.Micro instances: Current {_e2_1_micro + future_to_add_number_of_E2_1_Micro} | Maximum: 2"
             )
         else:
             logging.info(
-                f"✅ VM.Standard.E2.1.Micro instances: Current {_e2_1_micro+future_to_add_number_of_E2_1_Micro} | Maximum: 2"
+                f"✅ VM.Standard.E2.1.Micro instances: Current {_e2_1_micro + future_to_add_number_of_E2_1_Micro} | Maximum: 2"
             )
 
         if other_instances > 0:
@@ -328,16 +320,14 @@ def free_tier_check(
 
     # Checking VCN & Subnet
     try:
-        vcns = get_vcn(network_client=network_client,
-                       compartment_id=config["tenancy"])
+        vcns = get_vcn(network_client=network_client, compartment_id=config["tenancy"])
         if len(vcns) > 2:
             free_exceed = True
             logging.warning(
                 f"❌ Virtual Cloud Network: Current {len(vcns)} | Maximum: 2"
             )
         else:
-            logging.info(
-                f"✅ Virtual Cloud Network: Current {len(vcns)} | Maximum: 2")
+            logging.info(f"✅ Virtual Cloud Network: Current {len(vcns)} | Maximum: 2")
             for vcn in vcns:
                 logging.info(
                     f"\t☁️ VCN Name: {vcn.display_name} | IP Block: {vcn.cidr_block}"
@@ -431,8 +421,7 @@ def get_shape(compute_client, compartment_id, availability_domain) -> list:
     if len(shapes) == 0:
         raise RuntimeError("No available shape was found.")
 
-    vm_shapes = list(
-        filter(lambda shape: shape.shape.startswith("VM"), shapes))
+    vm_shapes = list(filter(lambda shape: shape.shape.startswith("VM"), shapes))
     if len(vm_shapes) == 0:
         raise RuntimeError("No available VM shape was found.")
 
@@ -450,8 +439,7 @@ def get_free_shape(compute_client, compartment_id, availability_domain) -> list:
     if len(shapes) == 0:
         raise RuntimeError("No available shape was found.")
 
-    vm_shapes = list(
-        filter(lambda shape: shape.shape.startswith("VM"), shapes))
+    vm_shapes = list(filter(lambda shape: shape.shape.startswith("VM"), shapes))
     if len(vm_shapes) == 0:
         raise RuntimeError("No available VM shape was found.")
 
@@ -485,8 +473,7 @@ def choose_os():
     answer = 6
     while answer not in os.keys():
         try:
-            answer = int(
-                input(">>> Choose the os for instances [1 2 3 4 5]: "))
+            answer = int(input(">>> Choose the os for instances [1 2 3 4 5]: "))
         except ValueError:
             print("❌ Must be a number")
 
@@ -518,8 +505,7 @@ def get_image_for_shape(compute, compartment_id, shape, operating_system) -> lis
 def telegram_setting(session):
     bot_api = None
     chat_id = None
-    answer = input(
-        "\n>>> Do you want to sent notification via Telegram? [Y]es/[N]o: ")
+    answer = input("\n>>> Do you want to sent notification via Telegram? [Y]es/[N]o: ")
 
     if answer not in ("y", "Y"):
         return bot_api, chat_id
@@ -579,9 +565,7 @@ def gen_ssh_keygen():
         logging.info(
             f"Create new ssh key pair, you can use this to login to your newly created instance."
         )
-        logging.info(
-            f"Feature are still in testing. Please also provide your ssh-key."
-        )
+        logging.info(f"Feature are still in testing. Please also provide your ssh-key.")
     try:
         subprocess.run(
             [
@@ -604,7 +588,8 @@ def gen_ssh_keygen():
             ssh_key = f.read().strip()
         logging.info(f"Script generated ssh-key: {ssh_key}")
         logging.info(
-            f"📌 Login usage: ssh -i script_ssh_key_autogen user@ip. Passphrase will be <empty passphrase>")
+            f"📌 Login usage: ssh -i script_ssh_key_autogen user@ip. Passphrase will be <empty passphrase>"
+        )
     except:
         pass
     return ssh_key

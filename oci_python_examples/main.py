@@ -24,20 +24,20 @@ logging.basicConfig(
 )
 
 BASE_DIR = Path(__file__).resolve().parent.parent
-config_path = BASE_DIR / 'env/config'
+config_path = BASE_DIR / "env/config"
 
 logging.debug("Loading config file...")
 try:
-    config = oci.config.from_file(
-        file_location=str(config_path)
-    )
+    config = oci.config.from_file(file_location=str(config_path))
 except oci.exceptions.ConfigFileNotFound:
     logging.error(
-        "Config file not found. Please put the config and oci_private_key.pem file in the evn folder!")
+        "Config file not found. Please put the config and oci_private_key.pem file in the evn folder!"
+    )
     sys.exit()
 except oci.exceptions.InvalidKeyFilePath:
     logging.error(
-        "Private key file not found. Please put the config and oci_private_key.pem file in the evn folder!")
+        "Private key file not found. Please put the config and oci_private_key.pem file in the evn folder!"
+    )
     sys.exit()
 
 logging.debug("Initialize oci client!")
@@ -54,8 +54,7 @@ list_of_availability_domain = get_availability_domain(
 if __name__ == "__main__":
     # Root compartment
     compartment_id = config["tenancy"]
-    logging.info(
-        f"Setting root compartment: {compartment_id[:40] + '**********'}")
+    logging.info(f"Setting root compartment: {compartment_id[:40] + '**********'}")
 
     message = """
 #################################################################
@@ -81,7 +80,8 @@ if __name__ == "__main__":
             config=config,
         )
         logging.warning(
-            "[Check current resource in account] Done. Script terminate automatically")
+            "[Check current resource in account] Done. Script terminate automatically"
+        )
         sys.exit()
 
     # Get availability_domain to create instances
@@ -110,16 +110,15 @@ if __name__ == "__main__":
             compartment_id=compartment_id,
             availability_domain=availability_domain,
         )
-        logging.info(
-            f"👉 User choose to create instance of '{shape_to_add.shape}'")
+        logging.info(f"👉 User choose to create instance of '{shape_to_add.shape}'")
 
         if shape_to_add.shape == "VM.Standard.E2.1.Micro":
             logging.warning(
-                "⚠️  Oracle policy: Instances using the VM.Standard.E2.1.Micro shape can only be created in one availability domain")
+                "⚠️  Oracle policy: Instances using the VM.Standard.E2.1.Micro shape can only be created in one availability domain"
+            )
             try:
                 future_to_add_number_of_E2_1_Micro = int(
-                    input(
-                        f"\n>>> Number of {shape_to_add.shape} instances to create: ")
+                    input(f"\n>>> Number of {shape_to_add.shape} instances to create: ")
                 )
                 if future_to_add_number_of_E2_1_Micro == 0:
                     logging.info("User choose 0. Exiting!")
@@ -146,7 +145,8 @@ if __name__ == "__main__":
                 # TODO Bypass precheck E1
                 if not _continue:
                     logging.error(
-                        "[Create new Free VM] Precheck fail. Script terminate automatically")
+                        "[Create new Free VM] Precheck fail. Script terminate automatically"
+                    )
                     sys.exit()
 
         if shape_to_add.shape == "VM.Standard.A1.Flex":
@@ -157,11 +157,11 @@ if __name__ == "__main__":
                 "\nInput shape config (cpu/ram). Rerun script if necessary to check free resource!"
             )
             future_to_add_a1_flex_ocpus = future_to_add_a1_flex_memory = 1000
-            while future_to_add_a1_flex_ocpus > 4 or future_to_add_a1_flex_ocpus <= 0:
+            while future_to_add_a1_flex_ocpus > 2 or future_to_add_a1_flex_ocpus <= 0:
                 try:
                     future_to_add_a1_flex_ocpus = int(
                         input(
-                            ">>> Choose the cpu core count (0 < n <= 4). Memory will be cpu * 6: "
+                            ">>> Choose the cpu core count (0 < n <= 2). Memory will be cpu * 6: "
                         )
                     )
                 except ValueError:
@@ -186,7 +186,8 @@ if __name__ == "__main__":
             # TODO Bypass precheck A1
             if not _continue:
                 logging.error(
-                    "[Create new Free VM] Precheck fail. Script terminate automatically")
+                    "[Create new Free VM] Precheck fail. Script terminate automatically"
+                )
                 sys.exit()
 
         # Choosing os to search for image
@@ -213,7 +214,7 @@ if __name__ == "__main__":
         if len(subnet_response) == 1:
             print("\nList of subnet in your account:")
             for index, subnet in enumerate(subnet_response):
-                print(f"\t[{index+1}]. {subnet.display_name}")
+                print(f"\t[{index + 1}]. {subnet.display_name}")
             print()
             subnet_id = subnet_response[0].id
             logging.info(
@@ -222,7 +223,7 @@ if __name__ == "__main__":
         elif len(subnet_response) > 1:
             print("\nList of subnet in your account:")
             for index, subnet in enumerate(subnet_response):
-                print(f"\t[{index+1}]. {subnet.display_name}")
+                print(f"\t[{index + 1}]. {subnet.display_name}")
             print()
             answer = None
 
@@ -235,7 +236,7 @@ if __name__ == "__main__":
                 if answer in ("s", "S"):
                     print("List of subnet in your account:")
                     for index, subnet in enumerate(subnet_response):
-                        print(f"\t[{index+1}]. {subnet.display_name}")
+                        print(f"\t[{index + 1}]. {subnet.display_name}")
                     print()
                 else:
                     try:
@@ -245,19 +246,19 @@ if __name__ == "__main__":
                 subnet_id = subnet_response[subnet_index - 1].id
         else:
             logging.error(
-                "Can't not get the subnet from account. Script terminate automatically")
+                "Can't not get the subnet from account. Script terminate automatically"
+            )
             sys.exit()
 
         # SSH-KEY Config
         script_ssh_key = gen_ssh_keygen()
         user_ssh_key = input_user_ssh_key()
-        final_ssh_key = "\n".join([script_ssh_key, user_ssh_key])
+        final_ssh_key = f"{script_ssh_key}\n{user_ssh_key}"
         logging.info(f"👉 Instance setting updated | {final_ssh_key=}")
 
         # Request interval config (random +-5 s)
         interval_between_requests = input_interval_between_request()
-        logging.info(
-            f"👉 Request setting updated | {interval_between_requests=}")
+        logging.info(f"👉 Request setting updated | {interval_between_requests=}")
 
         # Show user all info about instance about to create
         instance_message = None
@@ -268,8 +269,7 @@ if __name__ == "__main__":
             print(
                 "##############################    Instance info    ##############################"
             )
-            print(
-                f">> {future_to_add_number_of_E2_1_Micro}x {shape_to_add.shape}")
+            print(f">> {future_to_add_number_of_E2_1_Micro}x {shape_to_add.shape}")
             print(f">> Subnet {subnet_id}")
             print(f">> os: {os} | image: {image_to_add.display_name}")
             print(f">> Availability domain: {availability_domain.name}")
@@ -301,11 +301,11 @@ if __name__ == "__main__":
         print(
             'Go to https://cloud.oracle.com/compute/instances/create, check if availability domain, shape, image/os has "Always Free-eligible" tag.'
         )
-        answer = input(
-            ">>> Confirm / Acknowledge [Y]es/[N]o: ")
+        answer = input(">>> Confirm / Acknowledge [Y]es/[N]o: ")
         if answer not in ("y", "Y"):
             logging.error(
-                "User not accept the confirmation or no available \"Always Free-eligible\". Script terminate automatically.")
+                'User not accept the confirmation or no available "Always Free-eligible". Script terminate automatically.'
+            )
             sys.exit()
 
         telegram_notify(
@@ -313,8 +313,7 @@ if __name__ == "__main__":
         )
 
         # LAUNCH INSTANCE
-        print(
-            "Now the script will try to create instance with above setting...")
+        print("Now the script will try to create instance with above setting...")
         logging.info(
             "Compute Instance Monitoring is disabled by script to limit logging storage exceed for your free tier, you can enable it in instance setting"
         )
@@ -405,7 +404,7 @@ if __name__ == "__main__":
             current_instance_to_create = 0
             while current_instance_to_create < future_to_add_number_of_E2_1_Micro:
                 instance_display_name = gen_random_instance_name()
-                message = f"Create instance {current_instance_to_create+1}/{future_to_add_number_of_E2_1_Micro}. Display name set: {instance_display_name}"
+                message = f"Create instance {current_instance_to_create + 1}/{future_to_add_number_of_E2_1_Micro}. Display name set: {instance_display_name}"
                 logging.info(message)
                 telegram_notify(session, bot_api, chat_id, message)
 
@@ -485,4 +484,5 @@ if __name__ == "__main__":
         # Close session
         session.close()
         logging.info(
-            "[Create new Free VM] Create instance successfully. Script terminate automatically.")
+            "[Create new Free VM] Create instance successfully. Script terminate automatically."
+        )
